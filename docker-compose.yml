@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
   grafana:
-    image: grafana/grafana:6.0.2
+    image: grafana/grafana:latest
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -28,10 +28,8 @@ services:
       - data:/prometheus
       - ./conf/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./conf/prometheus/rules:/etc/prometheus/rules
-      - ./conf/prometheus/alerts:/etc/prometheus/alerts
     depends_on:
       - prometheus-pushgateway
-      - prometheus-alertmanager
     networks:
       - net
     restart: always
@@ -40,28 +38,6 @@ services:
     image: prom/pushgateway:v0.6.0
     ports:
       - '127.0.0.1:9091:9091'
-    networks:
-      - net
-    restart: always
-
-  prometheus-client-example:
-    image: hortonworks/alpine-curl:3.1
-    command: "sh /example.sh"
-    volumes:
-      - ./conf/example.sh:/example.sh
-    depends_on:
-      - prometheus-pushgateway
-    networks:
-      - net
-    restart: always
-
-  prometheus-alertmanager:
-    image: prom/alertmanager:v0.15.3
-    ports:
-    - '127.0.0.1:9093:9093'
-    volumes:
-      - ./conf/prometheus/alertmanager.yml:/etc/config/alertmanager.yml
-      - data:/alertmanager
     networks:
       - net
     restart: always

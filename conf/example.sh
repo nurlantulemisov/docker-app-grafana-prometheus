@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 # prometheus gateway server info
-HOST="prometheus-pushgateway"
+HOST="127.0.0.1"
 PORT="9091"
 PROTOCOL="http"
 
