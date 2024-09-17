@@ -15,41 +15,60 @@ services:
       - data:/var/lib/grafana/data
       - data:/var/lib/grafana/plugins
     depends_on:
-      - prometheus-server
+      - postgres
     networks:
       - net
     restart: always
 
-  prometheus-server:
-    image: prom/prometheus:latest
+  # prometheus-server:
+  #   image: prom/prometheus:latest
+  #   ports:
+  #     - '127.0.0.1:9090:9090'
+  #   volumes:
+  #     - data:/prometheus
+  #     - ./conf/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+  #     - ./conf/prometheus/rules:/etc/prometheus/rules
+  #   depends_on:
+  #     - prometheus-pushgateway
+  #   networks:
+  #     - net
+  #   restart: always
+  #   command:
+  #     [
+  #       '--log.level=debug',
+  #       '--config.file=/etc/prometheus/prometheus.yml',
+  #       '--query.lookback-delta=30s'
+  #     ]
+  #
+  # prometheus-pushgateway:
+  #   image: prom/pushgateway:latest
+  #   ports:
+  #     - '127.0.0.1:9091:9091'
+  #   networks:
+  #     - net
+  #   restart: always
+  #
+  postgres:
+    image: postgres:15-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_USER: grafana-user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: analytics
     ports:
-      - '127.0.0.1:9090:9090'
+      - "127.0.0.1:5432:5432"
+    networks:
+      - net
     volumes:
-      - data:/prometheus
-      - ./conf/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./conf/prometheus/rules:/etc/prometheus/rules
-    depends_on:
-      - prometheus-pushgateway
-    networks:
-      - net
-    restart: always
-    command:
-      [
-        '--log.level=debug',
-        '--config.file=/etc/prometheus/prometheus.yml',
-        '--query.lookback-delta=30s'
-      ]
-
-  prometheus-pushgateway:
-    image: prom/pushgateway:latest
-    ports:
-      - '127.0.0.1:9091:9091'
-    networks:
-      - net
-    restart: always
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations:/docker-entrypoint-initdb.d
+      - ./postgres-config/postgresql.conf:/etc/postgresql/postgresql.conf
+      - ./postgres-config/pg_hba.conf:/etc/postgresql/pg_hba.conf
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
 
 volumes:
   data:
+  pgdata:
 
 networks:
   net:

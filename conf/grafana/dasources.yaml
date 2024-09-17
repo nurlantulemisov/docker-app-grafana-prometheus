@@ -1,7 +1,19 @@
 apiVersion: 1
 datasources:
-- access: proxy
+# - access: proxy
+#   isDefault: true
+#   name: Prometheus
+#   type: prometheus
+#   url: http://prometheus-server:9090
+- name: PostgreSQL
+  type: postgres
+  access: proxy
+  url: postgres:5432
+  user: grafana-user
+  database: analytics
+  password: 12345
+  jsonData:
+    sslmode: disable    # Отключаем SSL (или замените на требуемое)
+    postgresVersion: 1500  # Версия PostgreSQL (например, 1200 для 12.x, можно подкорректировать)
+    timescaledb: false     # Если вы используете TimeScaleDB, установите true
   isDefault: true
-  name: Prometheus
-  type: prometheus
-  url: http://prometheus-server:9090
