@@ -18,6 +18,7 @@ EOF
 #push_prometheus "$prometheus_metric_name" "$value" "$instance"
 
 while true; do
+  echo "send"
   push_prometheus "web_active_users" "$(($RANDOM%10))" "web_frontend_server1"
   push_prometheus "web_active_users" "$(($RANDOM%10))" "web_frontend_server2"
   push_prometheus "web_active_users" "$(($RANDOM%10))" "web_frontend_server3"
